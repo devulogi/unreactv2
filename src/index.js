@@ -1,17 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { Component } from "react";
+import ReactDom from "react-dom";
+import unsplash from "./api/unsplash";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+import SeachBar from "./components/SearchBar";
+import ImageList from "./components/ImageList";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+class App extends Component {
+  state = { images: [] };
+
+  onSearchSubmit = async (term) => {
+    const response = await unsplash.get("/search/photos", {
+      params: {
+        query: term,
+      },
+    });
+    this.setState({ images: response.data.results });
+  };
+
+  render() {
+    return (
+      <div className="ui container">
+        <SeachBar onUserSubmit={this.onSearchSubmit} />
+        <ImageList images={this.state.images} />
+      </div>
+    );
+  }
+}
+
+ReactDom.render(<App />, document.querySelector("#root"));
